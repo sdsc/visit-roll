@@ -1,0 +1,30 @@
+#!/bin/bash
+/bin/mkdir -m 0755 -p ROOT_PKGROOTMODULEROOT
+
+cat > ROOT_PKGROOTMODULEROOT/VERSION <<END
+#%Module1.0
+module-whatis "visit_ROLLCOMPILER_ROLLMPI_ROLLNETWORK"
+module-whatis "Version: VERSION"
+if {! [info exists ::env(MPIHOME)]} {
+     module load openmpi_ib
+} elseif { ! [regexp "openmpi" \$::env(MPIHOME) ] } {
+     if { [regexp "mvapich2" \$::env(MPIHOME) ] } {
+        module switch mvapich2_ib openmpi_ib
+     } elseif { [ regexp "mpich2" \$::env(MPIHOME) ] } {
+        module switch mpich2_ib openmpi_ib
+     }
+}
+setenv VISITHOME INSTALLROOT
+prepend-path PATH INSTALLROOT/bin
+
+END
+
+chmod 0644  ROOT_PKGROOTMODULEROOT/VERSION
+
+cat > ROOT_PKGROOTMODULEROOT/.version.VERSION <<END
+#%Module1.0
+set ModulesVersion "VERSION"
+END
+
+(cd ROOT_PKGROOTMODULEROOT; /bin/ln -s .version.VERSION .version )
+
