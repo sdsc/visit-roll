@@ -1,0 +1,199 @@
+###############################################################################
+# Class: JobSubmitter_qsub_SDSC
+#
+# Purpose:    Custom "qsub" job submitter for SDSC.
+#
+# Programmer: Amit Chourasia 
+# Date:       Wed Jan 10 3:20 CST 2013
+#
+# Modifications:
+#
+###############################################################################
+
+# Set some global variables to make our life easy
+# include end slash
+gordon_install_path = "/opt/visit/" 
+
+
+class JobSubmitter_qsub_SDSC(JobSubmitter_qsub):
+    def __init__(self, launcher):        
+        super(JobSubmitter_qsub_SDSC, self).__init__(launcher)
+
+    # ASK how to launch mpirun sublauncher via qsub
+    def Executable(self):
+        return ["/opt/torque/bin/qsub"]
+
+    def mpirun_args(self, args):
+        mpicmd = self.mpirun()
+        if self.parallel.sublaunchargs != None:
+            mpicmd = mpicmd + self.parallel.sublaunchargs
+        mpicmd = mpicmd + ["-np", str(int(self.parallel.np) * int(self.parallel.nn))]
+        mpicmd = mpicmd + ["-machinefile", "$PBS_NODEFILE"]
+        mpicmd = mpicmd + self.VisItExecutable()
+        mpicmd = mpicmd + ["-plugindir", GETENV("VISITPLUGINDIR")]
+        mpicmd = mpicmd + args
+        return mpicmd
+
+    def CreateFilename(self, root):
+        if self.launcher.IsRunningOnGordon():
+            tdate = time.asctime()[11:19]
+            tuser = self.launcher.username()
+            return os.path.join(GETENV("HOME"), "%s.%s.%s" % (root, tuser, tdate))
+        return super(JobSubmitter_qsub_SDSC, self).CreateFilename(root)
+
+    """
+    def CreateFilename(self, root):
+        tdate = time.asctime()[11:19]
+        tdate = string.replace(tdate, ":", ".")
+        tuser = self.launcher.username()
+        filename = os.path.join("/tmp", "visit.%s.%s" % (tuser, tdate))
+        print 'FILENAME',filename
+        return filename 
+#        filename = super(JobSubmitter_qsub_SDSC, self).CreateFilename(root)
+#        return string.replace(filename, ":", ".")
+    """
+
+    def TFileSetup(self, tfile):
+        if self.launcher.IsRunningOnGordon():
+            tfile.write("cd %s\n" % GETENV("HOME"))
+            tfile.write("ulimit -c 0\n")
+            # Set correct module environment for Gordon
+            #tfile.write("source /etc/profile.d/modules.sh\n") #produces errors
+            tfile.write("module purge\n")
+            tfile.write("module load intel/2013.1.117 openmpi_ib/1.6.5 gnubase/1.0\n")
+            tfile.write("module load python\n")
+            #/opt/python/lib/python2.7
+            tfile.write("export PYTHONPATH=/opt/python/lib/python2.7")
+            tfile.write("export LD_LIBRARY_PATH=/opt/intel/composer_xe_2013.1.117/compiler/lib/intel64:/opt/openmpi/intel/ib/lib:" + GETENV("LIBPATH") +":$LD_LIBRARY_PATH\n")
+ 
+        elif self.launcher.IsRunningOnTrestles():
+            # to do
+            print ""
+        else:
+            super(JobSubmitter_qsub_SDSC, self).TFileSetup(tfile)
+
+    def SetupPPN(self, nodes, procs, ppn, use_vis):
+        if self.launcher.IsRunningOnGordon():
+            args = ["-l", "nodes=%s:ppn=%s:native" % (nodes, procs)]
+        elif self.launcher.IsRunningOnTrestles():
+            # to do
+            print ""
+        else:
+            args = super(JobSubmitter_qsub_SDSC, self).SetupPPN(nodes, procs, ppn, use_vis)
+        return args
+
+    def SetupTime(self):
+        if self.launcher.IsRunningOnGordon():
+            if self.parallel.time == None: # set queue to default if empty
+                args = ["-l", "walltime=01:00:00" ] # Set default as 1 hour
+            else:
+                args = ["-l", "walltime=%s" % self.parallel.time] # Set time
+        elif self.launcher.IsRunningOnTrestles():
+            # to do
+            print ""
+        else:
+            args = super(JobSubmitter_qsub_SDSC, self).AddEnvironment()
+        return args
+
+    def AddEnvironment(self):
+        if self.launcher.IsRunningOnGordon():
+            if self.parallel.partition == None: # set queue to default if empty
+                self.parallel.partition = 'normal'
+                args = ["-v", "QOS=0"] # Set QOS variable
+            else:
+                args = ["-q", "%s" % self.parallel.partition] # Set queue
+                args = args + ["-v", "QOS=0"] # Set QOS variable
+        elif self.launcher.IsRunningOnTrestles():
+            # to do
+            print ""
+        else:
+            args = super(JobSubmitter_qsub_SDSC, self).AddEnvironment()
+        return args
+
+###############################################################################
+# Class: SDSCLauncher
+#
+# Purpose:    Custom launcher for SDSC
+#
+# Programmer: Amit Chourasia 
+# Date:       Wed Jan 10 3:20 CST 2013
+#
+# Modifications:
+#
+###############################################################################
+
+class SDSCLauncher(MainLauncher):
+    def __init__(self):
+        super(SDSCLauncher, self).__init__()        
+        self.gordon = -1
+        self.trestles = -1
+        self.visitsupportdir = ""
+
+    def IsRunningOnGordon(self):
+        if self.gordon == -1:
+            self.gordon = 0 #commenting this makes the GUI client server work
+            print self.hostname()
+            print self.parallelArgs.parallel
+            print self.generalArgs.exe_name
+            print self.sectorname()
+            print self.gordon 
+            if self.sectorname() in ("gordon",  "gordon-ln", "gcn-"):
+                self.gordon = 1
+                print "INSIDE"
+                print self.sectorname()
+        return self.gordon
+
+    def IsRunningOnTrestles(self):
+        if self.trestles == -1:
+            self.trestles = 0
+            if self.parallelArgs.parallel and \
+               self.generalArgs.exe_name == "engine" and \
+               self.sectorname() in ("trestles", "trestles-login"):
+                self.trestles = 1
+        return self.trestles
+
+    def PrivatePlugins(self):
+        if self.IsRunningOnGordon():
+            values = (GETENV("HOME"), self.visitver, self.visitarch)
+            return "%s/.visit/%s/%s/plugins" % values        
+        return super(SDSCLauncher, self).PrivatePlugins()
+
+    def Customize(self):
+        # ----
+        # Gordon @ SDSC
+        # ----
+        if self.IsRunningOnGordon():
+            # ASK what should be the connect back host
+            #self.generalArgs.host = self.hostname()
+            self.visitsupportdir =  gordon_install_path + ("%s/linux-x86_64" % self.visitver)
+            ld_library_path = self.splitpaths(GETENV("LD_LIBRARY_PATH"))
+            added_icc_paths = ["/opt/intel/composer_xe_2013.1.117/compiler/lib/intel64"]
+            added_openmpi_paths = ["/opt/openmpi/intel/ib/lib"]
+
+            added_thirdparty_paths = [self.visitsupportdir + "/thirdparty"]  
+            added_visitlib_paths = [self.visitsupportdir + "/lib"]
+            #added_system_pythonlib_paths = ["/opt/python/lib/python2.7"]
+            #added_system_pythonlib_paths = ["/opt/python/lib/python2.7/lib-dynload"]
+            added_system_pythonlib_paths = [""]
+            SETENV("LD_LIBRARY_PATH", self.joinpaths(added_icc_paths + added_openmpi_paths + added_thirdparty_paths + added_visitlib_paths + added_system_pythonlib_paths + ld_library_path))
+            args = ["--mesa-lib", os.path.join(self.visitsupportdir, "lib/libOSMesa.so")]
+            args = args + ["-plugindir", os.path.join(self.visitsupportdir, "plugins")]
+            launcher.generalArgs.arguments = launcher.generalArgs.arguments + args
+
+        else:
+            # todo add info for trestles  
+            print ""
+       
+    #
+    # Override the JobSubmitterFactory method so the custom job submitter can
+    # be returned.
+    #
+    def JobSubmitterFactory(self, launch):
+        #if launch == "qsub/mpirun":
+        if launch[:4] == "qsub":
+            return JobSubmitter_qsub_SDSC(self)
+        return super(SDSCLauncher, self).JobSubmitterFactory(launch)
+
+# Launcher creation function
+def createlauncher():
+    return SDSCLauncher()

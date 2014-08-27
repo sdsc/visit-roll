@@ -1,0 +1,128 @@
+--- build_visit2_7_3	2014-07-22 11:28:17.575234870 -0700
++++ patch-files/build_visit2_7_3	2014-07-25 12:19:21.266151017 -0700
+@@ -444,7 +444,7 @@
+ export DO_SLIVR="no"
+ export ON_SLIVR="off"
+ export PREVENT_ICET="no"
+-GRAPHICAL="yes"
++GRAPHICAL="no"
+ ON_GRAPHICAL="on"
+ verify="no"
+ ON_verify="off"
+@@ -1520,34 +1520,34 @@
+          fi
+       else
+          if [[ "$GRAPHICAL" == "yes" ]] ; then
+-             if [[ "$REDIRECT_ACTIVE" == "yes" ]] ; then
+-                 $DLG --backtitle "$DLG_BACKTITLE" --yesno "The third party library location does not exist. Create it?" 0 0 1>&3
+-             else
+-                 $DLG --backtitle "$DLG_BACKTITLE" --yesno "The third party library location does not exist. Create it?" 0 0
+-             fi
+-             if [[ $? == 1 ]] ; then
+-                 error "The third party library location does not exist." \
+-                       "Bailing out."
+-             else
++#            if [[ "$REDIRECT_ACTIVE" == "yes" ]] ; then
++#                $DLG --backtitle "$DLG_BACKTITLE" --yesno "The third party library location does not exist. Create it?" 0 0 1>&3
++#            else
++#                $DLG --backtitle "$DLG_BACKTITLE" --yesno "The third party library location does not exist. Create it?" 0 0
++#            fi
++#            if [[ $? == 1 ]] ; then
++#                error "The third party library location does not exist." \
++#                      "Bailing out."
++#            else
+                  mkdir "$THIRD_PARTY_PATH"
+                  if [[ $? != 0 ]] ; then
+                     error "Unable to write files to the third party library location." \
+                           "Bailing out."
+                  fi
+-             fi
++#            fi
+          else
+-             info "The third party library location does not exist. Create it?"
+-             read RESPONSE
+-             if [[ "$RESPONSE" != "yes" ]] ; then
+-                 error "The third party library location does not exist." \
+-                       "Bailing out."
+-             else
++#            info "The third party library location does not exist. Create it?"
++#            read RESPONSE
++#            if [[ "$RESPONSE" != "yes" ]] ; then
++#                error "The third party library location does not exist." \
++#                      "Bailing out."
++#            else
+                  mkdir "$THIRD_PARTY_PATH"
+                  if [[ $? != 0 ]] ; then
+                     error "Unable to write files to the third party library location." \
+                           "Bailing out."
+                  fi
+-             fi
++#            fi
+          fi
+       fi
+    fi
+@@ -1601,12 +1601,12 @@
+         BYPASS_QT_LICENSE="yes"
+     fi
+ 
+-    if [[ "$BYPASS_QT_LICENSE" == "no" && "$DOWNLOAD_ONLY" == "no" ]] ; then
+-        qt_license_prompt
+-        if [[ $? != 0 ]] ;then
+-            error "Qt4 Open Source Edition License Declined. Bailing out."
+-        fi
+-    fi
++#   if [[ "$BYPASS_QT_LICENSE" == "no" && "$DOWNLOAD_ONLY" == "no" ]] ; then
++#       qt_license_prompt
++#       if [[ $? != 0 ]] ;then
++#           error "Qt4 Open Source Edition License Declined. Bailing out."
++#       fi
++#   fi
+ fi
+ 
+ #
+@@ -2958,6 +2958,7 @@
+     echo "##" >> $HOSTCONF
+     echo "VISIT_OPTION_DEFAULT(VISIT_C_COMPILER $C_COMPILER TYPE FILEPATH)">> $HOSTCONF
+     echo "VISIT_OPTION_DEFAULT(VISIT_CXX_COMPILER $CXX_COMPILER TYPE FILEPATH)" >> $HOSTCONF
++    echo "VISIT_OPTION_DEFAULT(VISIT_PYTHON_SKIP_INSTALL ON TYPE BOOL)" >> $HOSTCONF
+ 
+     if [[ "$USE_VISIBILITY_HIDDEN" == "yes" ]] ; then
+         echo "VISIT_OPTION_DEFAULT(VISIT_C_FLAGS \"$CFLAGS -fvisibility=hidden\" TYPE STRING)" >> $HOSTCONF
+@@ -12860,6 +12861,7 @@
+        warn "Unable to prepare Python build directory. Giving Up!"
+        return 1
+     fi
++    patch Python-2.7.5/Modules/Setup.dist ../patch-files/Setup.dist.patch
+ 
+     #
+     # Do any python patches if necessary
+@@ -12933,7 +12935,7 @@
+        return 1
+     fi
+     info "Installing Python . . ."
+-    $MAKE install
++    $MAKE -i install
+     if [[ $? != 0 ]] ; then
+        warn "Python build (make install) failed.  Giving up"
+        return 1
+@@ -13361,14 +13363,14 @@
+     fi
+ else
+     info $QT_LIC_MSG
+-    read RESPONSE
+-    if [[ "$RESPONSE" != "yes" ]] ; then
++#   read RESPONSE
++#   if [[ "$RESPONSE" != "yes" ]] ; then
+         info $QT_CONFIRM_MSG
+-        read RESPONSE
+-        if [[ $RESPONSE != "yes" ]] ; then
++#       read RESPONSE
++#       if [[ $RESPONSE != "yes" ]] ; then
+             return 1
+-        fi
+-    fi
++#       fi
++#   fi
+ fi
+ 
+ return 0
