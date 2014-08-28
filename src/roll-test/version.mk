@@ -1,3 +1,4 @@
-NAME	= visit-roll-test
-VERSION	= 1
-RELEASE = 6
+NAME	   = visit-roll-test
+VERSION	   = 1
+RELEASE    = 6
+RPM.EXTRAS = AutoReq:No

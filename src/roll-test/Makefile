@@ -1,13 +1,13 @@
-# --------------------------------------------------- -*- Makefile -*- --
-# $Id: Makefile,v 1.1 2012/11/17 05:51:55 jhayes Exp $
+#
+# $Id$
 #
 # @Copyright@
 # 
 # 				Rocks(r)
 # 		         www.rocksclusters.org
-# 		       version 5.2 (Chimichanga)
+# 		       version 6.1.1 (Sand Boa)
 # 
-# Copyright (c) 2000 - 2011 The Regents of the University of California.
+# Copyright (c) 2000 - 2014 The Regents of the University of California.
 # All rights reserved.	
 # 
 # Redistribution and use in source and binary forms, with or without
@@ -53,6 +53,9 @@
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # 
 # @Copyright@
+#
+# $Log$
+#
 
 PKGROOT = /root/rolltests
 REDHAT.ROOT = $(CURDIR)/../../

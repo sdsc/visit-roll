@@ -1,0 +1,163 @@
+--- build_visit2_5_2	2014-08-27 12:56:03.867536238 -0700
++++ patch-files/build_visit2_5_2	2014-08-27 20:12:02.337467241 -0700
+@@ -1367,34 +1367,34 @@
+          fi
+       else
+          if [[ "$GRAPHICAL" == "yes" ]] ; then
+-             if [[ "$REDIRECT_ACTIVE" == "yes" ]] ; then
+-                 $DLG --backtitle "$DLG_BACKTITLE" --yesno "The third party library location does not exist. Create it?" 0 0 1>&3
+-             else
+-                 $DLG --backtitle "$DLG_BACKTITLE" --yesno "The third party library location does not exist. Create it?" 0 0
+-             fi
+-             if [[ $? == 1 ]] ; then
+-                 error "The third party library location does not exist." \
+-                       "Bailing out."
+-             else
++#            if [[ "$REDIRECT_ACTIVE" == "yes" ]] ; then
++#                $DLG --backtitle "$DLG_BACKTITLE" --yesno "The third party library location does not exist. Create it?" 0 0 1>&3
++#            else
++#                $DLG --backtitle "$DLG_BACKTITLE" --yesno "The third party library location does not exist. Create it?" 0 0
++#            fi
++#            if [[ $? == 1 ]] ; then
++#                error "The third party library location does not exist." \
++#                      "Bailing out."
++#            else
+                  mkdir "$THIRD_PARTY_PATH"
+                  if [[ $? != 0 ]] ; then
+                     error "Unable to write files to the third party library location." \
+                           "Bailing out."
+                  fi
+-             fi
++#            fi
+          else
+-             info "The third party library location does not exist. Create it?"
+-             read RESPONSE
+-             if [[ "$RESPONSE" != "yes" ]] ; then
+-                 error "The third party library location does not exist." \
+-                       "Bailing out."
+-             else
++#            info "The third party library location does not exist. Create it?"
++#            read RESPONSE
++#            if [[ "$RESPONSE" != "yes" ]] ; then
++#                error "The third party library location does not exist." \
++#                      "Bailing out."
++#            else
+                  mkdir "$THIRD_PARTY_PATH"
+                  if [[ $? != 0 ]] ; then
+                     error "Unable to write files to the third party library location." \
+                           "Bailing out."
+                  fi
+-             fi
++#            fi
+          fi
+       fi
+    fi
+@@ -2718,6 +2718,7 @@
+     else
+         echo "VISIT_OPTION_DEFAULT(VISIT_C_FLAGS \"$CFLAGS\" TYPE STRING)" >> $HOSTCONF
+         echo "VISIT_OPTION_DEFAULT(VISIT_CXX_FLAGS \"$CXXFLAGS\" TYPE STRING)" >> $HOSTCONF
++        echo "VISIT_OPTION_DEFAULT(VISIT_SLIVR OFF TYPE BOOL)" >> $HOSTCONF
+     fi
+ 
+     if [[ "$parallel" == "yes" ]] ; then
+@@ -5527,8 +5528,11 @@
+ 
+ function bv_cmake_initialize
+ {
++    #amit
+     export DO_CMAKE="yes"
+     export ON_CMAKE="on"
++    #export DO_CMAKE="no"
++    #export ON_CMAKE="off"
+     export FORCE_CMAKE="no"
+     export USE_SYSTEM_CMAKE="no"
+     add_extra_commandline_args "cmake" "system-cmake" 0 "Use cmake found on system"
+@@ -5835,7 +5839,9 @@
+ # Build CMake
+ #
+ cd "$START_DIR"
++#amit
+ if [[ "$DO_CMAKE" == "yes" && "$USE_SYSTEM_CMAKE" == "no" ]]; then
++#if [[ "$DO_CMAKE" == "no" && "$USE_SYSTEM_CMAKE" == "yes" ]]; then
+     check_if_installed "cmake" $CMAKE_VERSION
+     if [[ $? == 0 ]] ; then
+         info "Skipping CMake build.  CMake is already installed."
+@@ -7625,7 +7631,7 @@
+    *                                                                          *
+    ****************************************************************************/
+   
+-! /* $Id: hdfi.h,v 1.156 2005/01/25 03:36:44 epourmal Exp $ */
++! /* $Id: build_visit2_5_2,v 1.7 2013/09/24 22:51:46 jpg Exp $ */
+   
+   #ifndef HDFI_H
+   #define HDFI_H
+@@ -7633,7 +7639,7 @@
+    *                                                                          *
+    ****************************************************************************/
+   
+-! /* $Id: hdfi.h 4798 2006-12-06 20:51:13Z epourmal $ */
++! /* $Id: build_visit2_5_2,v 1.7 2013/09/24 22:51:46 jpg Exp $ */
+   
+   #ifndef HDFI_H
+   #define HDFI_H
+@@ -12466,33 +12472,33 @@
+                 Qt licensing under the terms of the Lesser GNU General \
+                 Public License (LGPL) version 2.1 or \
+                 the GNU General Public License (GPL) version 3"
+-if [[ "$GRAPHICAL" == "yes" ]] ; then
+-    if [[ "$REDIRECT_ACTIVE" == "yes" ]] ; then
+-        $DLG --backtitle "$DLG_BACKTITLE" --yesno "$QT_LIC_MSG" 0 0 1>&3
+-    else
+-        $DLG --backtitle "$DLG_BACKTITLE" --yesno "$QT_LIC_MSG" 0 0 
+-    fi
+-    if [[ $? == 1 ]] ; then
+-        if [[ "$REDIRECT_ACTIVE" == "yes" ]] ; then
+-            $DLG --backtitle "$DLG_BACKTITLE" --yesno "$QT_CONFIRM_MSG" 0 0 1>&3
+-        else
+-            $DLG --backtitle "$DLG_BACKTITLE" --yesno "$QT_CONFIRM_MSG" 0 0 
+-        fi
+-        if [[ $? == 1 ]] ; then
+-            return 1
+-        fi
+-    fi
+-else
+-    info $QT_LIC_MSG
+-    read RESPONSE
+-    if [[ "$RESPONSE" != "yes" ]] ; then
+-        info $QT_CONFIRM_MSG
+-        read RESPONSE
+-        if [[ $RESPONSE != "yes" ]] ; then
+-            return 1
+-        fi
+-    fi
+-fi
++#if [[ "$GRAPHICAL" == "yes" ]] ; then
++#    if [[ "$REDIRECT_ACTIVE" == "yes" ]] ; then
++#        $DLG --backtitle "$DLG_BACKTITLE" --yesno "$QT_LIC_MSG" 0 0 1>&3
++#    else
++#        $DLG --backtitle "$DLG_BACKTITLE" --yesno "$QT_LIC_MSG" 0 0 
++#    fi
++#    if [[ $? == 1 ]] ; then
++#        if [[ "$REDIRECT_ACTIVE" == "yes" ]] ; then
++#            $DLG --backtitle "$DLG_BACKTITLE" --yesno "$QT_CONFIRM_MSG" 0 0 1>&3
++#        else
++#            $DLG --backtitle "$DLG_BACKTITLE" --yesno "$QT_CONFIRM_MSG" 0 0 
++#        fi
++#        if [[ $? == 1 ]] ; then
++#            return 1
++#        fi
++#    fi
++#else
++#    info $QT_LIC_MSG
++#    read RESPONSE
++#    if [[ "$RESPONSE" != "yes" ]] ; then
++#        info $QT_CONFIRM_MSG
++#        read RESPONSE
++#        if [[ $RESPONSE != "yes" ]] ; then
++#            return 1
++#        fi
++#    fi
++#fi
+ 
+ return 0
+ }

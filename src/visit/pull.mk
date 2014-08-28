@@ -45,31 +45,18 @@ ZIP_DIRS = $(ZIP_PKGS:%.zip=%)
 # Unbundle the package archives to create SRC_DIRS.
 # Can this be done with pattern matching/variables/filters?
 $(TAR_GZ_DIRS): $(TAR_GZ_PKGS)
-	@echo "::: Unbundling $@.tar.gz :::"
-	@$(TAR.CMD) $(TGZ.OPTS) $@.tar.gz
-	@echo ""
 
 $(TAR_BZ2_DIRS): $(TAR_BZ2_PKGS)
-	@echo "::: Unbundling $@.tar.bz2 :::"
-	@$(TAR.CMD) $(TBZ2.OPTS) $@.tar.bz2
-	@echo ""
 
 $(TGZ_DIRS): $(TGZ_PKGS)
-	@echo "::: Unbundling $@.tgz :::"
-	@$(TAR.CMD) $(TGZ.OPTS) $@.tgz
-	@echo ""
 
 $(ZIP_DIRS): $(ZIP_PKGS)
-	@echo "::: Unbundling $@.zip :::"
-	@$(UNZIP.CMD) $(UNZIP.OPTS) $@.zip
-	@echo ""
 
 # SRC_DIRS is the target that build will depend on
 SRC_DIRS = $(TAR_GZ_DIRS) $(TAR_BZ2_DIRS) $(TGZ_DIRS) $(ZIP_DIRS)
 
 # Clean up after ourselves...
 clean::
-	-rm -rf $(SRC_DIRS)
 
 distclean:: clean
 	-rm -rf $(SRC_PKGS)

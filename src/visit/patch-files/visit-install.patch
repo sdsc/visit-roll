@@ -1,0 +1,322 @@
+--- v2.5.2/visit2.5.2/src/svn_bin/visit-install	2012-08-01 07:34:45.000000000 -0700
++++ visit-install	2014-08-27 21:34:14.097338898 -0700
+@@ -8,10 +8,9 @@
+ # Date:   October 26, 1996
+ #
+ # Usage
+-#    visit-install [-c anag | anl | llnl_open | llnl_open_rz | llnl_open_cz |
+-#                      llnl_closed | nersc | ornl | princeton | sandia | 
+-#                      tacc | umich | nics | lsu]
+-#                  [-g group] [-gw] [-l] [-dmg] [-beta | -private]
++#    visit-install [-c anag | anl | llnl_open | llnl_closed | nersc | ornl |
++#                      princeton | sandia | tacc | umich | nics] [-g group]
++#                  [-gw] [-l] [-dmg] [-beta | -private]
+ #                  version platform directory
+ #
+ #    The default is to install this version as the current version.
+@@ -285,40 +284,6 @@
+ #    Eric Brugger, Wed Aug 24 10:20:22 PDT 2011
+ #    I added host profiles for coastal.
+ #
+-#    Eric Brugger, Wed Sep  7 09:55:39 PDT 2011
+-#    I replaced the alastor host profile with rzalastor.
+-#
+-#    Brad Whitlock, Wed Oct 12 09:49:37 PDT 2011
+-#    I added RZ/CZ options for LLNL.
+-#
+-#    Eric Brugger, Mon Feb 27 17:52:44 PST 2012
+-#    I added host profiles for unity, whitney and redsky-s.
+-#
+-#    Eric Brugger, Mon Mar  5 10:00:03 PST 2012
+-#    I corrected some errors with the changes I made to add host
+-#    profiles for unity, whitney and redsky-s.
+-#
+-#    Brad Whitlock, Fri Mar 30 10:04:31 PDT 2012
+-#    Add LSU host profiles.
+-#
+-#    Eric Brugger, Thu May 10 09:18:54 PDT 2012
+-#    I removed the host profile for franklin.
+-#
+-#    Eric Brugger, Mon May 21 17:16:15 PDT 2012
+-#    I added the host profile for zin.
+-#
+-#    Brad Whitlock, Tue Jun  5 10:16:11 PDT 2012
+-#    Remove profiles for minos, rhea.
+-#
+-#    Brad Whitlock, Fri Jun  8 11:54:58 PDT 2012
+-#    Account for different versions of RZ machine profiles.
+-#
+-#    Eric Brugger, Wed Jun 13 11:41:10 PDT 2012
+-#    I added the host profile for rzthriller.
+-#
+-#    Brad Whitlock, Tue Jul 31 17:03:25 PDT 2012
+-#    Add cab.
+-#
+ #-----------------------------------------------------------------------
+ 
+ Compress=COMPRESS
+@@ -384,7 +349,7 @@
+ done
+ 
+ if [ "$#" != "3" ]; then
+-   echo "Usage: visit-install [-c anag | anl | llnl_open | llnl_open_rz | llnl_open_cz | llnl_closed | nersc | ornl | princeton | sandia | sandia_closed | tacc | umich | nics | lsu]"
++   echo "Usage: visit-install [-c anag | anl | llnl_open | llnl_closed | nersc | ornl | princeton | sandia | tacc | umich | nics]"
+    echo "                     [-g group] [-b bank] [-gw] [-l] [-dmg]"
+    echo "                     [-beta | -private] version platform directory"
+    echo ""
+@@ -492,30 +457,27 @@
+ fi
+ 
+ while [ "$config" = "prompt" ]; do
+-   echo "Choose a system configuration file.  A system configuration"
+-   echo "file contains profiles that make it easy to access VisIt on"
+-   echo "remote computers."
+-   echo ""
+-   echo "   1) No system configuration"
+-   echo "   2) Configuration for ANAG/APDEC collaborators."
+-   echo "   3) ANL network"
+-   echo "   4) LLNL open network (CZ and RZ)"
+-   echo "   5)   LLNL open network (CZ only)"
+-   echo "   6)   LLNL open network (RZ only)"
+-   echo "   7) LLNL closed network"
+-   echo "   8) NERSC network"
+-   echo "   9) ORNL network"
+-   echo "   10) Princeton network"
+-   echo "   11) Sandia network"
+-   echo "   12) Sandia closed network"
+-   echo "   13) TACC network"
+-   echo "   14) U of Michigan Center for Advanced Computing network"
+-   echo "   15) NICS at University of Tennessee at Knoxville"
+-   echo "   16) Lousiana State University network"
+-   echo ""
+-   echo "Enter (1-16):"
++#  echo "Choose a system configuration file.  A system configuration"
++#  echo "file contains profiles that make it easy to access VisIt on"
++#  echo "remote computers."
++#  echo ""
++#  echo "   1) No system configuration"
++#  echo "   2) Configuration for ANAG/APDEC collaborators."
++#  echo "   3) ANL network"
++#  echo "   4) LLNL open network"
++#  echo "   5) LLNL closed network"
++#  echo "   6) NERSC network"
++#  echo "   7) ORNL network"
++#  echo "   8) Princeton network"
++#  echo "   9) Sandia network"
++#  echo "   10) TACC network"
++#  echo "   11) U of Michigan Center for Advanced Computing network"
++#  echo "   12) NICS at University of Tennessee at Knoxville"
++#  echo ""
++#  echo "(1,2,3,4,5,6,7,8,9,10,11,12):"
+ 
+-   read config
++   config=1
++#  read config
+    case "$config" in
+       1)
+          config=none
+@@ -530,41 +492,29 @@
+          config=llnl_open
+          ;;
+       5)
+-         config=llnl_open_cz
+-         ;;
+-      6)
+-         config=llnl_open_rz
+-         ;;
+-      7)
+          config=llnl_closed
+          ;;
+-      8)
++      6)
+          config=nersc
+          ;;
+-      9)
++      7)
+          config=ornl
+          ;;
+-      10)
++      8)
+          config=princeton
+          ;;
+-      11)
++      9)
+          config=sandia
+          ;;
+-      12)
+-         config=sandia_closed
+-         ;;
+-      13)
++      10)
+          config=tacc
+          ;;
+-      14)
++      11)
+          config=umich
+          ;;
+-      15)
++      12)
+          config=nics
+          ;;
+-      16)
+-         config=lsu
+-         ;;
+       *)
+          config=prompt
+          ;;
+@@ -580,10 +530,6 @@
+       ;;
+    llnl_open)
+       ;;
+-   llnl_open_cz)
+-      ;;
+-   llnl_open_rz)
+-      ;;
+    llnl_closed)
+       ;;
+    nersc)
+@@ -594,20 +540,16 @@
+       ;;
+    sandia)
+       ;;
+-   sandia_closed)
+-      ;;
+    tacc)
+       ;;
+    umich)
+       ;;
+    nics)
+-      ;; 
+-   lsu)
+       ;;
+    *)
+       echo "Illegal configuration option, choices are none, anag, anl,"
+-      echo "llnl_open, llnl_open_cz, llnl_open_rz, llnl_closed, nersc, ornl, "
+-      echo "princeton, sandia, sandia_closed, tacc, umich, nics, and lsu."
++      echo "llnl_open, llnl_closed, nersc, ornl, princeton, sandia, tacc,"
++      echo "umich, and nics."
+       exit 4
+       ;;
+ esac
+@@ -713,11 +655,11 @@
+ rm -rf "$dir"/$version+/.visit/hosts
+ mkdir "$dir"/$version+/.visit/hosts
+ if [ "$config" = "anl" ]; then
+-   cp "$dir"/$version+/.visit/allhosts/host_anl_cosmea.xml     "$dir"/$version+/.visit/hosts/
+-   cp "$dir"/$version+/.visit/allhosts/host_anl_eureka.xml     "$dir"/$version+/.visit/hosts/
+-   cp "$dir"/$version+/.visit/allhosts/host_anl_gadzooks.xml   "$dir"/$version+/.visit/hosts/
+-   cp "$dir"/$version+/.visit/allhosts/host_anl_mcs_login.xml  "$dir"/$version+/.visit/hosts/
+-   cp "$dir"/$version+/.visit/allhosts/host_anl_teragrid.xml   "$dir"/$version+/.visit/hosts/
++   cp "$dir"/$version+/.visit/allhosts/host_anl_cosmea.xml   "$dir"/$version+/.visit/hosts/
++   cp "$dir"/$version+/.visit/allhosts/host_anl_eureka.xml   "$dir"/$version+/.visit/hosts/
++   cp "$dir"/$version+/.visit/allhosts/host_anl_gadzooks.xml "$dir"/$version+/.visit/hosts/
++   cp "$dir"/$version+/.visit/allhosts/host_anl_mcs_login.xml   "$dir"/$version+/.visit/hosts/
++   cp "$dir"/$version+/.visit/allhosts/host_anl_teragrid.xml "$dir"/$version+/.visit/hosts/
+ elif [ "$config" = "llnl_closed" ]; then
+    ln -s visit-config-llnl_closed.ini "$dir"/$version+/.visit/config
+    cp "$dir"/$version+/.visit/allhosts/host_lanl_closed_cielo.xml   "$dir"/$version+/.visit/hosts/
+@@ -726,40 +668,24 @@
+    cp "$dir"/$version+/.visit/allhosts/host_llnl_closed_graph.xml   "$dir"/$version+/.visit/hosts/
+    cp "$dir"/$version+/.visit/allhosts/host_llnl_closed_inca.xml    "$dir"/$version+/.visit/hosts/
+    cp "$dir"/$version+/.visit/allhosts/host_llnl_closed_juno.xml    "$dir"/$version+/.visit/hosts/
++   cp "$dir"/$version+/.visit/allhosts/host_llnl_closed_minos.xml   "$dir"/$version+/.visit/hosts/
+    cp "$dir"/$version+/.visit/allhosts/host_llnl_closed_muir.xml    "$dir"/$version+/.visit/hosts/
++   cp "$dir"/$version+/.visit/allhosts/host_llnl_closed_rhea.xml    "$dir"/$version+/.visit/hosts/
+    cp "$dir"/$version+/.visit/allhosts/host_llnl_closed_tempest.xml "$dir"/$version+/.visit/hosts/
+-   cp "$dir"/$version+/.visit/allhosts/host_llnl_closed_zin.xml     "$dir"/$version+/.visit/hosts/
+    cp "$dir"/$version+/.visit/allhosts/host_snl_closed_redrose.xml  "$dir"/$version+/.visit/hosts/
+ elif [ "$config" = "llnl_open" ]; then
+    ln -s visit-config-llnl_open.ini  "$dir"/$version+/.visit/config
+-   cp "$dir"/$version+/.visit/allhosts/host_llnl_aztec.xml            "$dir"/$version+/.visit/hosts/
+-   cp "$dir"/$version+/.visit/allhosts/host_llnl_cab.xml              "$dir"/$version+/.visit/hosts/
+-   cp "$dir"/$version+/.visit/allhosts/host_llnl_edge.xml             "$dir"/$version+/.visit/hosts/
+-   cp "$dir"/$version+/.visit/allhosts/host_llnl_hera.xml             "$dir"/$version+/.visit/hosts/
+-   cp "$dir"/$version+/.visit/allhosts/host_llnl_prism.xml            "$dir"/$version+/.visit/hosts/
+-   cp "$dir"/$version+/.visit/allhosts/host_llnl_rzgw_rzalastor.xml   "$dir"/$version+/.visit/hosts/
+-   cp "$dir"/$version+/.visit/allhosts/host_llnl_rzgw_rzmerl.xml      "$dir"/$version+/.visit/hosts/
+-   cp "$dir"/$version+/.visit/allhosts/host_llnl_rzgw_rzthriller.xml  "$dir"/$version+/.visit/hosts/
+-   cp "$dir"/$version+/.visit/allhosts/host_llnl_rzgw_rzzeus.xml      "$dir"/$version+/.visit/hosts/
+-   cp "$dir"/$version+/.visit/allhosts/host_llnl_sierra.xml           "$dir"/$version+/.visit/hosts/
+-   cp "$dir"/$version+/.visit/allhosts/host_slac_red.xml              "$dir"/$version+/.visit/hosts/
+-elif [ "$config" = "llnl_open_cz" ]; then
+-   ln -s visit-config-llnl_open.ini  "$dir"/$version+/.visit/config
++   cp "$dir"/$version+/.visit/allhosts/host_llnl_alastor.xml "$dir"/$version+/.visit/hosts/
++   cp "$dir"/$version+/.visit/allhosts/host_llnl_atlas.xml   "$dir"/$version+/.visit/hosts/
+    cp "$dir"/$version+/.visit/allhosts/host_llnl_aztec.xml   "$dir"/$version+/.visit/hosts/
+-   cp "$dir"/$version+/.visit/allhosts/host_llnl_cab.xml     "$dir"/$version+/.visit/hosts/
+    cp "$dir"/$version+/.visit/allhosts/host_llnl_edge.xml    "$dir"/$version+/.visit/hosts/
+    cp "$dir"/$version+/.visit/allhosts/host_llnl_hera.xml    "$dir"/$version+/.visit/hosts/
+-   cp "$dir"/$version+/.visit/allhosts/host_llnl_oslic.xml   "$dir"/$version+/.visit/hosts/
+    cp "$dir"/$version+/.visit/allhosts/host_llnl_prism.xml   "$dir"/$version+/.visit/hosts/
+    cp "$dir"/$version+/.visit/allhosts/host_llnl_sierra.xml  "$dir"/$version+/.visit/hosts/
++   cp "$dir"/$version+/.visit/allhosts/host_llnl_rzzeus.xml  "$dir"/$version+/.visit/hosts/
+    cp "$dir"/$version+/.visit/allhosts/host_slac_red.xml     "$dir"/$version+/.visit/hosts/
+-elif [ "$config" = "llnl_open_rz" ]; then
+-   ln -s visit-config-llnl_open.ini  "$dir"/$version+/.visit/config
+-   cp "$dir"/$version+/.visit/allhosts/host_llnl_rzalastor.xml   "$dir"/$version+/.visit/hosts/
+-   cp "$dir"/$version+/.visit/allhosts/host_llnl_rzmerl.xml      "$dir"/$version+/.visit/hosts/
+-   cp "$dir"/$version+/.visit/allhosts/host_llnl_rzthriller.xml  "$dir"/$version+/.visit/hosts/
+-   cp "$dir"/$version+/.visit/allhosts/host_llnl_rzzeus.xml      "$dir"/$version+/.visit/hosts/
+ elif [ "$config" = "nersc" ]; then
++   cp "$dir"/$version+/.visit/allhosts/host_nersc_franklin.xml "$dir"/$version+/.visit/hosts/
+    cp "$dir"/$version+/.visit/allhosts/host_nersc_hopper.xml "$dir"/$version+/.visit/hosts/
+    cp "$dir"/$version+/.visit/allhosts/host_nersc_euclid.xml "$dir"/$version+/.visit/hosts/
+ elif [ "$config" = "ornl" ]; then
+@@ -774,28 +700,22 @@
+    cp "$dir"/$version+/.visit/allhosts/host_princeton_hecate.xml      "$dir"/$version+/.visit/hosts/
+    cp "$dir"/$version+/.visit/allhosts/host_princeton_tigressdata.xml "$dir"/$version+/.visit/hosts/
+ elif [ "$config" = "sandia" ]; then
+-   cp "$dir"/$version+/.visit/allhosts/host_sandia_glory.xml   "$dir"/$version+/.visit/hosts/
+-   cp "$dir"/$version+/.visit/allhosts/host_sandia_redsky.xml  "$dir"/$version+/.visit/hosts/
+-elif [ "$config" = "sandia_closed" ]; then
+-   cp "$dir"/$version+/.visit/allhosts/host_sandia_closed_unity.xml     "$dir"/$version+/.visit/hosts/
+-   cp "$dir"/$version+/.visit/allhosts/host_sandia_closed_whitney.xml   "$dir"/$version+/.visit/hosts/
+-   cp "$dir"/$version+/.visit/allhosts/host_sandia_closed_redsky-s.xml  "$dir"/$version+/.visit/hosts/
++   cp "$dir"/$version+/.visit/allhosts/host_sandia_glory.xml "$dir"/$version+/.visit/hosts/
++   cp "$dir"/$version+/.visit/allhosts/host_sandia_redsky.xml "$dir"/$version+/.visit/hosts/
+ elif [ "$config" = "tacc" ]; then
+-   cp "$dir"/$version+/.visit/allhosts/host_tacc_longhorn.xml  "$dir"/$version+/.visit/hosts/
+-   cp "$dir"/$version+/.visit/allhosts/host_tacc_ranger.xml    "$dir"/$version+/.visit/hosts/
+-   cp "$dir"/$version+/.visit/allhosts/host_tacc_spur.xml      "$dir"/$version+/.visit/hosts/
++   cp "$dir"/$version+/.visit/allhosts/host_tacc_longhorn.xml "$dir"/$version+/.visit/hosts/
++   cp "$dir"/$version+/.visit/allhosts/host_tacc_ranger.xml "$dir"/$version+/.visit/hosts/
++   cp "$dir"/$version+/.visit/allhosts/host_tacc_spur.xml   "$dir"/$version+/.visit/hosts/
+ elif [ "$config" = "umich" ]; then
+-   cp "$dir"/$version+/.visit/allhosts/host_umich_flux.xml  "$dir"/$version+/.visit/hosts/
++   cp "$dir"/$version+/.visit/allhosts/host_umich_flux.xml "$dir"/$version+/.visit/hosts/
+    cp "$dir"/$version+/.visit/allhosts/host_umich_nyx.xml   "$dir"/$version+/.visit/hosts/
+ elif [ "$config" = "nics" ]; then
+-   cp "$dir"/$version+/.visit/allhosts/host_nics_kraken.xml    "$dir"/$version+/.visit/hosts/
+-   cp "$dir"/$version+/.visit/allhosts/host_nics_nautilus.xml  "$dir"/$version+/.visit/hosts/
++   cp "$dir"/$version+/.visit/allhosts/host_nics_kraken.xml "$dir"/$version+/.visit/hosts/
++   cp "$dir"/$version+/.visit/allhosts/host_nics_nautilus.xml "$dir"/$version+/.visit/hosts/
+ elif [ "$config" = "anag" ]; then
+    ln -s visit-config-anag.ini    "$dir"/$version+/.visit/config
+    ln -s visit-guiconfig-anag.ini "$dir"/$version+/.visit/guiconfig
+    ln -s visit-visitrc-anag.ini   "$dir"/$version+/.visit/visitrc
+-elif [ "$config" = "lsu" ]; then
+-   cp "$dir"/$version+/.visit/allhosts/host_lsu_philip.xml "$dir"/$version+/.visit/hosts/
+ fi
+ 
+ # Do the bank fixup
+@@ -810,9 +730,9 @@
+ # can be clicked on from the Finder and have VisIt work.
+ #
+ if [ "$os" = "darwin" ]; then
+-    # Create a clickable script to run the cli, and xmledit.
++    # Create a clickable script to run the cli, silex, and xmledit.
+     csh=`which csh`
+-    for appscript in "VisIt" "cli" "XmlEdit"; do
++    for appscript in "VisIt" "cli" "Silex" "XmlEdit"; do
+         app=`echo $appscript | tr "[A-Z]" "[a-z]"`
+         if [ -e "$dir"/bin/$appscript.command ]; then
+             rm -f "$dir"/bin/$appscript.command
+@@ -899,7 +819,7 @@
+ #
+ # Make the symbolic links for the programs
+ #
+-programs="curv3dprep makemili mpeg2encode surfcomp text2polys time_annotation visit visitconvert xml2atts xml2avt xml2info xml2java xml2makefile xml2cmake xml2projectfile xml2python xml2window xmledit xmltest visit_composite visit_transition"
++programs="curv3dprep makemili mpeg2encode silex surfcomp text2polys time_annotation visit visitconvert xml2atts xml2avt xml2info xml2java xml2makefile xml2cmake xml2projectfile xml2python xml2window xmledit xmltest visit_composite visit_transition"
+ 
+ cd "$dir"/bin
+ for prog in $programs; do
