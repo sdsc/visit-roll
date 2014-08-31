@@ -128,10 +128,6 @@ MPISETUP = \
 build: $(SRC_DIRS)
 	yum -y install subversion.x86_64
 	yum -y install mesa-libGLU-devel.x86_64
-	mkdir -p $(ROOT)/$(PKGROOT)
-	mkdir -p $(PKGROOT)
-	mkdir -p $(ROOT)/$(PKGROOT)/thirdparty
-	mkdir -p $(ROOT)/$(PKGROOT)/data
 	mkdir v$(VERSION)
 	cp build_visit2_5_2 v$(VERSION)
 	cp *z v$(VERSION)
@@ -139,6 +135,10 @@ build: $(SRC_DIRS)
 	@echo "::: Package $(NAME) build complete :::"
 
 install::
+	mkdir -p $(ROOT)/$(PKGROOT)
+	mkdir -p $(PKGROOT)
+	mkdir -p $(ROOT)/$(PKGROOT)/thirdparty
+	mkdir -p $(ROOT)/$(PKGROOT)/data
 	mount --bind $(ROOT)/$(PKGROOT) $(PKGROOT)
 	( \
 	  $(COMPILERSETUP); \

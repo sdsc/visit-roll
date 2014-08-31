@@ -1,4 +1,4 @@
-NAME	     = visit_$(ROLLCOMPILER)_$(ROLLNETWORK)_$(ROLLMPI)
+NAME	     = visit_$(ROLLCOMPILER)_$(ROLLMPI)_$(ROLLNETWORK)
 VERSION	     = 2.5.2
 RELEASE	     = 6
 PKGROOT      = /opt/visit
