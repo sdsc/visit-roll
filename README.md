@@ -63,9 +63,6 @@ make ROLLCOMPILER=intel ROLLMPI=mvapich2 ROLLNETWORK=ib
 produces a roll with a name that begins "`visit_intel_mvapich2_ib`"; it
 contains and installs similarly-named rpms.
 
-For gnu compilers, the roll also supports a `ROLLOPTS` make variable value of
-'avx', indicating that the target architecture supports AVX instructions.
-
 
 ## Installation
 
