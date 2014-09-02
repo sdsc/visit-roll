@@ -128,7 +128,7 @@ MPISETUP = \
 build: $(SRC_DIRS)
 	yum -y install subversion.x86_64
 	yum -y install mesa-libGLU-devel.x86_64
-        yum -y install qt-x11-4.6.2-26.el6_4.x86_64
+	yum -y install qt-x11-4.6.2-26.el6_4.x86_64
 	mkdir v$(VERSION)
 	cp build_visit2_5_2 v$(VERSION)
 	cp *z v$(VERSION)
