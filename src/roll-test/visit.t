@@ -23,7 +23,7 @@ SKIP: {
   skip 'visit not installed', 4 if ! $isInstalled;
   # The graphical nature of visit limits the testing we can do
   $output = `/opt/visit/bin/visit -version 2>&1`;
-  like($output, qr/The current version of VisIt is 2.7.3./, 'visit exec works');
+  like($output, qr/The current version of VisIt is/, 'visit exec works');
 
   skip 'modules not installed', 3 if ! -f '/etc/profile.d/modules.sh';
   `/bin/ls /opt/modulefiles/applications/visit/[0-9]* 2>&1`;
