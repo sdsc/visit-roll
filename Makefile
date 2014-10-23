@@ -5,9 +5,10 @@
 # 
 # 				Rocks(r)
 # 		         www.rocksclusters.org
-# 		       version 6.1.1 (Sand Boa)
+# 		         version 5.6 (Emerald Boa)
+# 		         version 6.1 (Emerald Boa)
 # 
-# Copyright (c) 2000 - 2014 The Regents of the University of California.
+# Copyright (c) 2000 - 2013 The Regents of the University of California.
 # All rights reserved.	
 # 
 # Redistribution and use in source and binary forms, with or without
@@ -57,11 +58,44 @@
 # $Log$
 #
 
+ifndef ROLLCOMPILER
+  ROLLCOMPILER = gnu
+endif
+ifndef ROLLMPI
+  ROLLMPI = openmpi
+endif
+ifndef ROLLNETWORK
+  ROLLNETWORK = eth
+endif
+
 -include $(ROLLSROOT)/etc/Rolls.mk
 include Rolls.mk
 
-default: roll
+default:
+	for i in `ls nodes/*.in`; do \
+	  export o=`echo $$i | sed 's/\.in//'`; \
+	  cp $$i $$o; \
+	  for c in $(ROLLCOMPILER); do \
+	    COMPILERNAME=`echo $$c | awk -F/ '{print $$1}'`; \
+	    perl -pi -e 'print and s/COMPILERNAME/'$${COMPILERNAME}'/g if m/COMPILERNAME/' $$o; \
+	  done; \
+	  for n in $(ROLLNETWORK); do \
+	    perl -pi -e 'print and s/ROLLNETWORK/'$${n}'/g if m/ROLLNETWORK/' $$o; \
+	  done; \
+	  for m in $(ROLLMPI); do \
+	    perl -pi -e 'print and s/ROLLMPI/'$${m}'/g if m/ROLLMPI/' $$o; \
+	  done; \
+	  perl -pi -e '$$_ = "" if m/COMPILERNAME|ROLLNETWORK|ROLLMPI/' $$o; \
+	done
+	$(MAKE) ROLLCOMPILER="$(ROLLCOMPILER)" ROLLNETWORK="$(ROLLNETWORK)" ROLLMPI="$(ROLLMPI)" roll
 
-distclean:: clean
-	-rm -f _arch build.log
-	-rm -rf RPMS SRPMS src/build-*
+clean::
+	rm -f _arch bootstrap.py
+
+distclean: clean
+	for i in `ls nodes/*.in`; do \
+	  export o=`echo $$i | sed 's/\.in//'`; \
+	  rm -f $$o; \
+	done
+	rm -fr RPMS SRPMS
+	-rm -f build.log

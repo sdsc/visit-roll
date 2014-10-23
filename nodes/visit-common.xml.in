@@ -19,7 +19,7 @@
 	</changelog>
 
 	<package>visit_ROLLCOMPILER_ROLLNETWORK_ROLLMPI</package>
-	<package>visit--modules</package>
+	<package>visit-modules</package>
 	<package>visit-roll-test</package>
 	<package>roll-visit-usersguide</package>
 

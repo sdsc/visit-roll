@@ -5,9 +5,10 @@
 # 
 # 				Rocks(r)
 # 		         www.rocksclusters.org
-# 		       version 6.1.1 (Sand Boa)
+# 		         version 5.6 (Emerald Boa)
+# 		         version 6.1 (Emerald Boa)
 # 
-# Copyright (c) 2000 - 2014 The Regents of the University of California.
+# Copyright (c) 2000 - 2013 The Regents of the University of California.
 # All rights reserved.	
 # 
 # Redistribution and use in source and binary forms, with or without
@@ -57,14 +58,31 @@
 # $Log$
 #
 
--include $(shell $(ROCKSROOT)/bin/arch).mk
--include $(shell $(ROCKSROOT)/bin/os).mk
+-include $(shell ${ROCKSROOT}/bin/arch).mk
+-include $(shell ${ROCKSROOT}/bin/os).mk
 
-default:	pkg
+default:
+	@echo "copyright|rpm|pkg|clean"
 
-copyright pkg rpm clean::
-	for i in $(SRCDIRS) ; do \
-		cd $$i; \
-		$(MAKE) $@ || exit 2 ; \
-		cd ..; \
+copyright rpm pkg clean::
+	for i in $(SRCDIRS); do \
+	  grep -q ROLLCOMPILER $$i/version.mk; \
+	  if test $$? -eq 0; then \
+	    for c in $(ROLLCOMPILER); do \
+	      for n in $(ROLLNETWORK); do \
+	        grep -q ROLLMPI $$i/version.mk; \
+	        if test $$? -eq 0; then \
+	          for m in $(ROLLMPI); do \
+	            echo make $@ in $$i with ROLLCOMPILER=$$c ROLLNETWORK=$$n ROLLMPI=$$m; \
+	            (cd $$i && $(MAKE) ROLLCOMPILER=$$c ROLLNETWORK=$$n ROLLMPI=$$m $@) || exit 2; \
+	          done; \
+	        else \
+	          echo make $@ in $$i with ROLLCOMPILER=$$c ROLLNETWORK=$$n; \
+	          (cd $$i && $(MAKE) ROLLCOMPILER=$$c ROLLNETWORK=$$n $@) || exit 2; \
+	        fi; \
+	      done; \
+	    done; \
+	  else \
+	    (cd $$i && $(MAKE) ROLLCOMPILER="$(ROLLCOMPILER)" ROLLMPI="$(ROLLMPI)" ROLLNETWORK="$(ROLLNETWORK)" $@) || exit 2; \
+	  fi; \
 	done
