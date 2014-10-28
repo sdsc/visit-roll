@@ -1,0 +1,6 @@
+#%Module1.0
+module-whatis "visit_ROLLCOMPILER_ROLLMPI"
+module-whatis "Version: VERSION"
+setenv VISITHOME /opt/visit
+prepend-path PATH /opt/visit/bin
+module load ROLLCOMPILER ROLLMPI
