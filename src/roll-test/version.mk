@@ -1,4 +1,6 @@
-NAME	   = visit-roll-test
-VERSION	   = 1
+NAME       = visit-roll-test
+VERSION    = 1
 RELEASE    = 6
+PKGROOT    = /root/rolltests
+
 RPM.EXTRAS = AutoReq:No
