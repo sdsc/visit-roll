@@ -56,21 +56,6 @@
 #
 # $Log$
 #
-ROLLCOMMENT=#
-ifeq ( "$(ROLLCOMPILER)","intel")
-    ROLLCOMMENT= 
-endif
-ifndef ROLLCOMPILER
-  ROLLCOMPILER = gnu
-endif
-
-
-ifndef ROLLNETWORK
-  ROLLNETWORK = eth
-endif
-ifndef ROLLMPI
-  ROLLMPI = openmpi
-endif
 
 REDHAT.ROOT = $(PWD)/../../
 
@@ -78,89 +63,65 @@ REDHAT.ROOT = $(PWD)/../../
 include Rules.mk
 include pull.mk
 
-export C_COMPILER=gcc
-export C_OPT_FLAGS=" -O3 -fPIC"
-export CFLAGS=-fPIC
-export CXXFLAGS=-fPIC
-export CXX_COMPILER=g++
-export CXX_OPT_FLAGS=" -O3 -fPIC"
-COMPILERSETUP = \
-  if test -e /etc/profile.d/modules.sh; then \
-    . /etc/profile.d/modules.sh; \
-    module load $(ROLLCOMPILER); \
-  fi; \
-  if test "$(ROLLCOMPILER)" = "intel"; then \
-      export C_COMPILER=icc; \
-      export C_OPT_FLAGS=" -O3 -fPIC"; \
-      export CXX_COMPILER=icpc; \
-      export CXX_OPT_FLAGS=" -O3 -Wno-deprecated -fPIC"; \
-  fi; \
-  if test "$(ROLLCOMPILER)" = "pgi"; then \
-      export C_COMPILER=pgcc; \
-      export C_OPT_FLAGS=" -O3 -fPIC"; \
-      export CXX_COMPILER=pgCC; \
-      export CXX_OPT_FLAGS=" -O3 -fPIC"; \
-   fi
-
-
-ifeq ("$(ROLLNETWORK)", "eth")
-  MPI = $(ROLLMPI)
-else
-  MPI = $(ROLLMPI)_$(ROLLNETWORK)
+CC = gcc
+CXX = g++
+ifeq ("$(COMPILERNAME)", "intel")
+  CC = icc
+  CXX = icpc
+else ifeq ("$(COMPILERNAME)", "pgi")
+  CC = pgcc
+  CXX = pgCC
 endif
 
+COMPILERSETUP =  \
+  module load $(ROLLCOMPILER) || true; \
+  echo === Compiler and version ===; \
+  $(CC) --version
+
 MPISETUP = \
-  if test -e /etc/profile.d/modules.sh; then \
-    . /etc/profile.d/modules.sh; \
-    module load $(MPI); \
-  fi; \
-  export MPI_HOME=`which mpicxx | perl -pe 's!/bin/.*!!'`; \
-  if test -z "$${MPI_HOME}"; then \
-    export MPI_HOME=/opt/$(ROLLMPI); \
-  fi; \
-  echo Using MPI from $${MPI_HOME}; \
-  export PATH=$${PATH}:$${MPI_HOME}/bin; \
-  export LD_LIBRARY_PATH=$${LD_LIBRARY_PATH}:$${MPI_HOME}/lib; \
-  export PAR_INCLUDE=-I$${MPI_HOME}/include; \
-  export PAR_LIBS=$${MPI_HOME}/lib; \
-  export PAR_COMPILER=$${MPI_HOME}/bin/mpicxx
+  module load $(ROLLMPI) || true; \
+  echo === MPIHOME ===; \
+  echo $${MPIHOME}
 
 build: $(SRC_DIRS)
-	yum -y install subversion.x86_64
-	yum -y install mesa-libGLU-devel.x86_64
-	yum -y install qt-x11.x86_64
+	patch visit$(VERSION)/src/svn_bin/visit-install $(REDHAT.ROOT)/src/visit/patch-files/visit-install.patch
+	patch visit$(VERSION)/src/bin/internallauncher $(REDHAT.ROOT)/src/visit/patch-files/internallauncher.$(VERSION).patch
 	mkdir v$(VERSION)
-	cp build_visit2_5_2 v$(VERSION)
-	cp *z v$(VERSION)
+	cp build_visit2_5_2 *z v$(VERSION)
 	patch v$(VERSION)/build_visit2_5_2 patch-files/build_visit2_5_2.patch
 	@echo "::: Package $(NAME) build complete :::"
 
 install::
-	mkdir -p $(ROOT)/$(PKGROOT)
-	mkdir -p $(PKGROOT)
-	mkdir -p $(ROOT)/$(PKGROOT)/thirdparty
-	mkdir -p $(ROOT)/$(PKGROOT)/data
+	mkdir -p -m 755 $(ROOT)/$(PKGROOT)
+	mkdir -p -m 755 $(ROOT)/$(PKGROOT)/thirdparty
+	mkdir -p -m 755 $(ROOT)/$(PKGROOT)/data
+	-mkdir -p -m 755 $(PKGROOT)
 	mount --bind $(ROOT)/$(PKGROOT) $(PKGROOT)
 	( \
 	  $(COMPILERSETUP); \
 	  $(MPISETUP); \
-          export MAKE_OPT_FLAGS="-j 16"; \
- 	  cd v$(VERSION); \
- 	  bash build_visit2_5_2 --pyside --boxlib --h5part --hdf5 --netcdf --silo --vtk --xdmf --console --parallel --thirdparty-path $(PKGROOT)/thirdparty; \
-           patch visit$(VERSION)/src/svn_bin/visit-install $(REDHAT.ROOT)/src/visit/patch-files/visit-install.patch; \
-           patch visit$(VERSION)/src/bin/internallauncher $(REDHAT.ROOT)/src/visit/patch-files/internallauncher.$(VERSION).patch; \
-           cd visit$(VERSION)/src; \
-           make package; \
-           ./svn_bin/visit-install $(VERSION) linux-x86_64 $(PKGROOT); \
-           cd $(PKGROOT); \
-           ln -s $(VERSION) current; \
- 	)
-	-umount $(PKGROOT)
+	  export PAR_INCLUDE=-I$${MPI_HOME}/include; \
+	  export PAR_LIBS=$${MPI_HOME}/lib; \
+	  export PAR_COMPILER=$${MPI_HOME}/bin/mpicxx; \
+	  export C_COMPILER=$(CC); \
+	  export CXX_COMPILER=$(CXX); \
+	  export CFLAGS=-fPIC; \
+	  export CXXFLAGS=-fPIC; \
+	  export C_OPT_FLAGS=" -O3 -fPIC"; \
+	  export CXX_OPT_FLAGS=" -O3 -fPIC"; \
+	  export MAKE_OPT_FLAGS="-j 16"; \
+	  cd v$(VERSION); \
+	  bash build_visit2_5_2 --pyside --boxlib --h5part --hdf5 --netcdf --silo --vtk --xdmf --console --parallel --thirdparty-path $(PKGROOT)/thirdparty; \
+	  cd visit$(VERSION)/src; \
+	  make package; \
+	  ./svn_bin/visit-install $(VERSION) linux-x86_64 $(PKGROOT); \
+	  cd $(PKGROOT); \
+	  ln -s $(VERSION) current; \
+	)
+	umount $(PKGROOT)
+	-rmdir -p $(PKGROOT)
 	rm -rf $(ROOT)/$(PKGROOT)/data/*
 	cp *.silo $(ROOT)/$(PKGROOT)/data
-	mkdir -p $(REDHAT.ROOT)/src/build-visit-modules
-	cat visit.module | perl -pi -e "s!INSTALLROOT!$(PKGROOT)!g;s!MODULEROOT!/opt/modulefiles/applications/visit!g;s!VERSION!$(VERSION)!g;s!ROLLCOMPILER!$(ROLLCOMPILER)!g;s!ROLLMPI!$(ROLLMPI)!g;s!ROLLNETWORK!$(ROLLNETWORK)!g" \
-          > $(REDHAT.ROOT)/src/build-visit-modules/$(NAME).module
 	@echo "::: Package $(NAME) install complete :::"
 
 clean::

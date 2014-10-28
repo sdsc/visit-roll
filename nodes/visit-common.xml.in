@@ -2,26 +2,18 @@
 
 <kickstart>
 
+<description>
+The visit Roll
+https://wci.llnl.gov/codes/visit/home.html
+</description>
 
-	<description>
-	The visit Roll
-	https://wci.llnl.gov/codes/visit/home.html
-	</description>
+<copyright>
+Copyright (c) 2000 - 2014 The Regents of the University of California.
+All rights reserved. Rocks(r) v6.1.1 www.rocksclusters.org
+</copyright>
 
-	<copyright>
-	Copyright (c) 2000 - 2014 The Regents of the University of California.
-	All rights reserved. Rocks(r) v6.1.1 www.rocksclusters.org
-	
-	</copyright>
-
-	<changelog>
-	$Log$
-	</changelog>
-
-	<package>visit_COMPILERNAME_ROLLNETWORK_ROLLMPI</package>
-	<package>visit-modules</package>
-	<package>visit-roll-test</package>
-	<package>roll-visit-usersguide</package>
-
+<package>visit_COMPILERNAME_MPINAME</package>
+<package>visit-modules</package>
+<package>visit-roll-test</package>
 
 </kickstart>
