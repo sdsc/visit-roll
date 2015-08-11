@@ -1,5 +1,7 @@
 # SDSC "visit" roll
 
+The visit-roll is deprecated; SDSC no longer supports or develops it.
+
 ## Overview
 
 This roll bundles visit
